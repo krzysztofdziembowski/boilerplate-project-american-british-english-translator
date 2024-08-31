@@ -8,5 +8,96 @@ chai.use(chaiHttp);
 let Translator = require('../components/translator.js');
 
 suite('Functional Tests', () => {
-
+    test('Translation with text and locale fields: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({text: 'Mangoes are my favorite fruit.', locale: 'american-to-british'})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body,
+                {
+                    text: 'Mangoes are my favorite fruit.',
+                    translation: 'Mangoes are my <span class="highlight">favourite</span> fruit.'
+                });
+            done();
+        });
+    });
+    test('Translation with text and invalid locale field: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({text: "Ceci n'est pas une pipe", locale: 'french-to-american'})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body, { error: 'Invalid value for locale field' })
+            done();
+        });
+    });
+    test('Translation with missing text field: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({locale: 'british-to-american'})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body, { error: 'Required field(s) missing' })
+            done();
+        });
+    });
+    test('Translation with missing locale field: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({text: ''})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body, { error: 'Required field(s) missing' })
+            done();
+        });
+    });
+    test('Translation with empty text: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({text: '', locale: 'british-to-american'})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body, { error: 'No text to translate' })
+            done();
+        });
+    });
+    test('Translation with text that needs no translation: POST request to /api/translate', function(done) {
+        assert.isTrue(true);
+        chai
+        .request(server)
+        .keepOpen()
+        .post(`/api/translate/`)
+        .send({text: 'SaintPeter and nhcarrigan give their regards!', locale: 'british-to-american'})
+        .end(function(err, res){
+            assert.equal(err, null);
+            assert.equal(res.status, 200);
+            assert.deepEqual(res.body,
+                {
+                    text: 'SaintPeter and nhcarrigan give their regards!',
+                    translation: 'Everything looks good to me!'
+                });
+            done();
+        });
+    });
 });
